@@ -1,5 +1,8 @@
 import math
 from constants import AppConstants
+from GoalSeekAlgo import GoalSeek
+from TestGoalSeek import test, motor_torque_function
+from vehiclerequest import VehicleRequest
 
 
 class Result:
@@ -76,24 +79,9 @@ def find_motor_peak_motor_torque():
     val_A = (AppConstants.AIR_DENSITY * drag_coefficient * frontal_areas) / (2 * gross_vehile_weight)  # G14
     print('val_A: ', val_A)
     val_B = (wheel_torque / (gross_vehile_weight * wheel_radius)) - AppConstants.ACCELERATION_DUE_TO_GRAVITY * ((
-                (rolling_resistance_coefficient * math.cos(slope_in_rad)) + math.sin(
-            slope_in_rad)))  # G15 TODO: Check computation order
+            (rolling_resistance_coefficient * math.cos(slope_in_rad)) + math.sin(
+        slope_in_rad)))  # G15 TODO: Check computation order
     print('val_B: ', val_B)
-
-    # while True:
-    #     result = Result(request_time_instant)
-    #     result.set_speed(val_A, val_B)
-    #     distance = math.floor(result.get_distance(val_A, val_B) * 1000)
-    #
-    #     if(distance > AppConstants.ARAI_TEST_DISTANCE):
-    #         #print('redu')
-    #         motor_torque=-1
-    #         continue
-    #     elif(distance < AppConstants.ARAI_TEST_DISTANCE):
-    #         motor_torque=+1
-    #         continue
-    #     else:
-    #         break
 
     print('\nCalculated Motor Torque: ', motor_torque)
     print('Computation Finished')
@@ -118,8 +106,38 @@ def find_motor_peak_motor_torque():
         print('---')
 
 
+def get_motor_torque():
+    print('Computation starts----')
+    print('Parsing: Vehicle Dynamics - start')
+
+    filename = 'vehicle_dynamics_request.txt'
+    print('Reading: ', filename)
+
+    vehicle_request = VehicleRequest()
+    file_stream = open(filename, "r")
+    vehicle_request.gross_vehicle_weight = float(file_stream.readline().split(",")[1])
+    vehicle_request.wheel_radius = float(file_stream.readline().split(",")[1])
+    vehicle_request.gear_ratio = float(file_stream.readline().split(",")[1])
+    vehicle_request.gear_efficiency = float(file_stream.readline().split(",")[1])
+    vehicle_request.rolling_resistance_coefficient = float(file_stream.readline().split(",")[1])
+    vehicle_request.slope_in_deg = float(file_stream.readline().split(",")[1])
+    vehicle_request.drag_coefficient = float(file_stream.readline().split(",")[1])
+    vehicle_request.frontal_area = float(file_stream.readline().split(",")[1])
+    vehicle_request.request_time_instant = float(file_stream.readline().split(",")[1])
+    file_stream.close()
+
+    print(vehicle_request.to_string())
+    print('Parsing: Vehicle Dynamics - finish')
+
+    res = GoalSeek(motor_torque_function, 17, 0, vehicle_request)
+    print(res)
+
+    res = test(vehicle_request)
+    print('2', res)
+
+    print('Computation finish----')
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    find_motor_peak_motor_torque()
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    get_motor_torque()

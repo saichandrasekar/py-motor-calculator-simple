@@ -1,0 +1,9 @@
+gross_vehicle_weight_in_kg,800
+wheel_radius_in_m,0.23
+gear_ratio,10
+gear_efficiency_percentage,90
+rolling_resistance_coefficient,0.005
+drag_coefficient,0.15
+frontal_area,2.3
+slope_in_deg,5.00
+gradeability_time_seconds,10
